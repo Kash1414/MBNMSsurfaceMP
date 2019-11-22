@@ -1,0 +1,50 @@
+#########################################################
+# Lauren's premliminary figures for MBNMS water samples
+#########################################################
+
+# Load pacakges and data ----
+library(tidyverse)
+```{r}
+library(tidyverse)
+SE = function(x){sd(x)/sqrt(sum(!is.na(x)))}  #function to calculate standard error
+
+LK_data <- read.csv("Sample Particle Counts - Sheet2.csv") %>% 
+  mutate(ID = str_remove(sampleid, "_."))  #creating new column that removes the underscore and picture number from each ID for grouping
+```
+
+
+# create summary tables ----
+```{r}
+
+LK_data_summ <- LK_data %>% 
+  group_by(ID) %>% 
+  summarise(type = first(Type),
+            location = first(Location),
+            total_count = sum(Count)*4,
+            total_fibers = sum(Fibers)*4,
+            total_particles = sum(Particles)*4)
+
+
+groups_sum <- LK_data_summ %>% 
+  group_by(type) %>% 
+  summarise(mean_count = mean(total_count),
+            SE_count = SE(total_count))
+
+```
+
+
+
+# initial plots----
+```{r}
+
+LK_boxplot <- LK_data_summ %>% 
+  filter(type != "other") %>% 
+  ggplot() +
+  geom_boxplot(aes(type, total_count), outlier.shape = NA) +
+  geom_jitter(aes(type, total_count, color = location)) +
+  scale_y_log10(labels = scales::comma) +
+  theme_classic()
+LK_boxplot
+```
+
+

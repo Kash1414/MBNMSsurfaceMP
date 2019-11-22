@@ -1,0 +1,75 @@
+---
+title: "Particle Counts"
+author: "Lauren Kashiwabara"
+date: "September 26, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, include=FALSE}
+library(ggplot2)
+library(tidyverse)
+library(readr)
+```
+
+##Data Table
+```{r, include=FALSE}
+counts<- read_csv("~/Desktop/Research/Microplastics/Sample Particle Counts - Sheet2.csv")
+View(counts)
+
+counts_summ <- counts %>% 
+  group_by()
+
+```
+
+###Summary Statistics
+```{r}
+offshore<-subset(counts, counts$Type=="offshore")
+nearshore<-subset(counts, counts$Type=="nearshore")
+blank<-subset(counts, counts$Type=="Blank")
+
+logtrans<-(log(counts$Count+0.01))
+View(logtrans)
+
+mo<-mean(offshore$Count)
+mn<-mean(nearshore$Count)
+mb<-mean(blank$Count)
+```
+
+
+##Making some figures
+```{r}
+noplot<-ggplot(counts)+geom_point(aes(x = Type, y=Count, color=factor(Type)))
+noplot
+
+###+scale_y_continuous(limits = c(0, 10))
+
+locplot<-ggplot(counts)+geom_boxplot(aes(x = Location, y=logtrans, color=factor(Type)))
+locplot
+###+scale_y_continuous(limits = c(0,10) )
+```
+
+
+
+##Nearshore vs Offshore t-tests and assumptions
+```{r, include=FALSE}
+hist(nearshore$Count)
+shapiro.test(nearshore$Count)
+qqnorm(nearshore$Count)
+boxplot(nearshore$Count, horizontal=T)
+
+par(mfrow=c(2,2))
+
+hist(offshore$Count)
+shapiro.test(offshore$Count+1)
+qqnorm(offshore$Count)
+boxplot(offshore$Count, horizontal=T)
+
+t.test(nearshore$Count,offshore$Count)
+t.test(nearshore$Count, blank$Count)
+t.test(offshore$Count,blank$Count)
+```

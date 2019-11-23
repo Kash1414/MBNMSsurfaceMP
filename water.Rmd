@@ -28,7 +28,8 @@ LK_data_summ <- LK_data %>%
 groups_sum <- LK_data_summ %>% 
   group_by(type) %>% 
   summarise(mean_count = mean(total_count),
-            SE_count = SE(total_count))
+            SE_count = SE(total_count),
+            MP_range = )
 
 ```
 
@@ -45,6 +46,11 @@ LK_boxplot <- LK_data_summ %>%
   scale_y_log10(labels = scales::comma) +
   theme_classic()
 LK_boxplot
+
+
+
+# barplot position_dodge stacked bar plot ggplot; total count as response
+
 ```
 
 

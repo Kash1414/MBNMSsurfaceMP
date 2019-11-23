@@ -139,6 +139,7 @@ mean(count_offshore$total_count)/120
 
 ```
 
+j
 
 ###Testing assumptions/t-tests
 ```{r}

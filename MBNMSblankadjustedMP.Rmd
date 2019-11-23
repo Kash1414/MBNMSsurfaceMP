@@ -1,0 +1,170 @@
+---
+title: "Microplastics Poster Figure"
+author: "Lauren Kashiwabara"
+date: "October 24, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#########################################################
+# Lauren's premliminary figures for MBNMS water samples
+#########################################################
+
+# Load pacakges and data ----
+
+```{r}
+library(tidyverse)
+SE = function(x){sd(x)/sqrt(sum(!is.na(x)))}  #function to calculate standard error
+
+LK_data <- read.csv("Sample Particle Counts - Sheet2.csv") %>% #creating new column that removes the underscore and picture number from each ID for grouping
+  drop_na(Count)
+
+LK_data 
+```
+
+
+# create summary tables ----
+```{r}
+
+LK_data_summ <- LK_data %>% 
+  group_by(sampleid) %>% 
+  summarise(type = first(Type),
+            location = first(Location),
+            total_count = sum(Count)*4,
+            total_fibers = sum(Fibers)*4,
+            total_particles = sum(Particles)*4)
+LK_data_summ
+
+groups_sum <- LK_data_summ %>% 
+  group_by(type) %>% 
+  summarise(mean_count = mean(total_count),
+            SE_count = SE(total_count))
+
+```
+
+
+
+# initial plots----
+```{r}
+
+LK_data_summ <- LK_data_summ %>% 
+  mutate(blank_adj_count = total_count - 22,
+         blank_adj_count_zero_corr = ifelse(blank_adj_count < 0, 0, blank_adj_count),
+         blank_adj_count_m3 = blank_adj_count/120,
+         blank_adj_count_m3_zero_corr = ifelse(blank_adj_count_m3 < 0, 0, blank_adj_count_m3))
+
+# LK_data_summ$total_count/120
+# 
+# count_blank=subset(LK_data_summ, LK_data_summ$type=="Blank")
+# count_blank
+# median(count_blank$total_count)
+# 
+# 
+# adj=LK_data_summ$total_count-22 #blank adjusted
+# 
+# adj
+
+
+# water=abs(na.omit(LK_data_summ$total_count/120))
+# water
+
+
+
+LK_data_summ$total_count
+
+#marine pollution bulle
+
+
+LK_boxplot<-LK_data_summ %>% 
+  filter(!type %in% c("other", "Blank", "Field")) %>% 
+  ggplot() +
+  geom_boxplot(aes(type, blank_adj_count_m3_zero_corr), outlier.shape = NA) +
+  geom_jitter(aes(type, blank_adj_count_m3_zero_corr, color = location)) +
+  scale_y_log10(labels = scales::comma) +
+  theme_classic() +
+  labs(x="Type", 
+       y=bquote("Number of MP"~(m~3)), 
+       title="Microplastic Particle Distribution")
+
+LK_boxplot
+
+
+#x = bquote('x axis'~(Å^2)),
+
+
+
+
+
+
+LK_loc <- LK_data_summ %>% 
+  filter(!type %in% c("other", "Blank", "Field")) %>% 
+  ggplot() +
+  geom_boxplot(aes(location, abs(total_count/120), outlier.shape = NA) +
+  geom_jitter(aes(location, abs(total_count/120), color = "nearshore")) +
+  #scale_y_log10(labels = scales::comma) +
+  theme_classic())
+  
+  LK_loc
+
+
+###water
+mean(120,
+106,
+133,
+81,
+84,
+85,
+257,
+179,
+222,
+234,
+248,
+232,
+250,
+237,
+227)
+
+LK_data_summ$total_count
+sum(48,    4,    4,  296,  700,   16,  108,   92,   60,   76,   72,  112,  116,   84,    0,    4,   20,
+19,   84,  188,   48,   76,   88,   48,   56,   96, 2344,   72,   12,   16,   28,   32,    8,   24,   20,   32,
+37,  24,    4,   28,    8,   16,   36,   24,    0 ,  44,   80,  152,   24,    4,   40)
+
+5624/120
+
+mean(count_nearshore$total_count)/120
+mean(count_offshore$total_count)/120
+
+```
+
+
+###Testing assumptions/t-tests
+```{r}
+count_marina=subset(LK_data_summ, LK_data_summ$location=="Marina")
+count_sur=subset(LK_data_summ, LK_data_summ$location=="SurRidge")
+count_david=subset(LK_data_summ, LK_data_summ$location=="Davidson")
+count_board=subset(LK_data_summ, LK_data_summ$location=="Boardwalk")
+count_nearshore=subset(LK_data_summ, LK_data_summ$type=="nearshore")
+count_offshore=subset(LK_data_summ, LK_data_summ$type=="offshore")
+count_blank=subset(LK_data_summ, LK_data_summ$type=="blank")
+
+log(count_offshore$total_count+0.01)
+
+count_marina
+
+par(mfrow=c(2,2))
+hist(count_board$total_count)
+shapiro.test((count_offshore$total_count+0.01)^(-1))
+shapiro.test((count_nearshore$total_count)^(-1))
+
+
+qqnorm(count_david$total_count)
+qqline(count_david$total_count)
+boxplot(count_david$total_count, horizontal=T)
+
+t.test((count_nearshore$total_count)^(-1), sqrt(count_offshore$total_count))
+t.test(count_marina$total_count, count_sur$total_count)
+```
+

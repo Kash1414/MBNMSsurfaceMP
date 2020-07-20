@@ -18,7 +18,7 @@ library(readr)
 
 ##Data Table
 ```{r, include=FALSE}
-counts<- read_csv("~/Desktop/Research/Microplastics/MBNMSsurfaceMP/Sample Particle Counts - Sheet2.csv")
+counts<- read_csv("Sample Particle Counts - Sheet2.csv")
 View(counts)
 
 counts_summ <- counts %>% 
